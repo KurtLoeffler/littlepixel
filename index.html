@@ -1,0 +1,197 @@
+
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+
+	<title>PixelUp</title>
+	<meta name="description" content="Upsample pixels!">
+	<meta name="author" content="Kurt Loeffler">
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<script src="pixelup.js"></script>
+
+	<div align="center">
+		<div style="height: 100px;"></div>
+
+		<div id="dropzoneContainer">
+			<div class="dropzonebg">
+				<div style="position:absolute; top:50%; height:300px; margin-top:-130px; left:50%; width:250px; margin-left:-250px;">
+					<div unselectable='on' onclick="document.getElementById('fileInput').click();" class="dropzone" id="dropzoneid">
+						<br/>
+						<br/>
+						<div>Drop a png here...</div>
+					</div>
+				</div>
+			</div>
+			<input type="file" id="fileInput" onchange="processFile(this.files[0]); this.value = null;" style="visibility:hidden;position:absolute;top:-50;left:-50"/>
+			<div style="height: 300px;"></div>
+		</div>
+
+		<div id="resultContainer" style="display: none;">
+			<h3>Original</h3>
+			<img id="sourceImage">
+
+			<h3>Resampled</h3>
+			<img id="destImage">
+
+		</div>
+
+		<div id="processingContainer" style="display: none;">
+			<div class="dropzonebg">
+				<div style="position:absolute; top:50%; height:300px; margin-top:-130px; left:50%; width:250px; margin-left:-250px;">
+					<div unselectable='on' onclick="document.getElementById('fileInput').click();" class="dropzone" id="dropzoneid">
+						<br/>
+						<br/>
+						<h2>Processing...</h2>
+					</div>
+				</div>
+			</div>
+			<div style="height: 300px;"></div>
+		</div>
+
+		<div style="height: 300px;"></div>
+	</div>
+
+	<div align="center">
+		<div style="text-align: left; width: 550px">
+			<h3>What Is This?</h3>
+			<p>This is a web utility that allows you to upsample pixel art using the <a href="http://www.scale2x.it/" target="_blank">scale2x</a> algorithm.</p>
+			<p>It is completely written in javascript so files do not leave your computer.</p>
+			<div align="center">
+				<img src="examples/mario.png" />
+				<div style="height: 16px;"></div>
+				<img src="examples/sky02.png" />
+			</div>
+			<p>Often when creating pixel art you may realize that you started too small and need a higher resolution. This utility was created to easily allow someone to create an upsampled starting point, and refine the results.</p>
+			<p>It may also be beneficial to intentionally start pixeling at half or quater resolution, then upsample and refine.</p>
+
+			<div style="height: 100px;"></div>
+		</div>
+	</div>
+
+	<script>
+		function setResultUIState(state)
+		{
+			if (state)
+			{
+				document.getElementById('resultContainer').style.display = "inherit";
+			}
+			else
+			{
+				document.getElementById('resultContainer').style.display = "none";
+			}
+		}
+
+		function setDropzoneUIState(state)
+		{
+			if (state)
+			{
+				document.getElementById('dropzoneContainer').style.display = "inherit";
+			}
+			else
+			{
+				document.getElementById('dropzoneContainer').style.display = "none";
+			}
+		}
+
+		function setProcessingUIState(state)
+		{
+			if (state)
+			{
+				document.getElementById('processingContainer').style.display = "inherit";
+			}
+			else
+			{
+				document.getElementById('processingContainer').style.display = "none";
+			}
+		}
+
+		function processFile(file)
+		{
+			if (!file)
+			{
+				return;
+			}
+
+			var filename = file.name;
+			var fileExt = undefined;
+
+			if (filename.length > 4)
+			{
+				fileExt = filename.split('.').pop();
+			}
+			else
+			{
+				return;
+			}
+
+			if (fileExt != "png")
+			{
+				return;
+			}
+
+			var filenameWithoutExt = filename.substr(0, filename.length-fileExt.length-1);
+
+			console.log("processing...");
+
+			setResultUIState(false);
+			setDropzoneUIState(false);
+			setProcessingUIState(true);
+
+			var reader = new FileReader();
+			reader.onload = function(e)
+			{
+				setResultUIState(true);
+				setDropzoneUIState(true);
+				setProcessingUIState(false);
+
+				var contents = e.target.result;
+				document.getElementById('sourceImage').src = contents;
+				var pixelData = onSourceLoad();
+				var dataURL = pixelData.toDataURL();
+				document.getElementById("destImage").src = dataURL;
+
+				document.getElementById('destImage').addEventListener("dragstart", function (e) {
+				  e.dataTransfer.setData("DownloadURL", "image/png:"+filenameWithoutExt+"x2.png:"+dataURL);
+				});
+
+				console.log("done");
+			};
+			reader.readAsDataURL(file);
+		}
+
+		function onload() {
+			originalDropZoneHTML = document.getElementById('dropzoneid').innerHTML;
+
+			drop = document.getElementById('dropzoneid');
+
+			function cancel(e) {
+				if (e.preventDefault) { e.preventDefault(); }
+				return false;
+			}
+
+			drop.addEventListener('dragover', cancel, false);
+			drop.addEventListener('dragenter', cancel, false);
+
+			function onDrop(e)
+			{
+				e = e || window.event;
+				if (e.preventDefault)
+				{
+					e.preventDefault();
+				}
+				processFile(e.dataTransfer.files[0]);
+				return false;
+			}
+			drop.addEventListener('drop', onDrop, false);
+		}
+
+		window.addEventListener('load', onload, false);
+	</script>
+
+</body>
+</html>
