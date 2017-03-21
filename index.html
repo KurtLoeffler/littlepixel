@@ -155,9 +155,9 @@
 				var dataURL = pixelData.toDataURL();
 				document.getElementById("destImage").src = dataURL;
 
-				document.getElementById('destImage').addEventListener("dragstart", function (e) {
-				  e.dataTransfer.setData("DownloadURL", "https://image/png:"+filenameWithoutExt+"x2.png:"+dataURL);
-				});
+				//document.getElementById('destImage').addEventListener("dragstart", function (e) {
+				//  e.dataTransfer.setData("DownloadURL", "image/png:"+filenameWithoutExt+"x2.png:"+dataURL);
+				//});
 
 				console.log("done");
 			};
