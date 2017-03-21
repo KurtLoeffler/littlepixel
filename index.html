@@ -110,6 +110,21 @@
 			}
 		}
 
+		function processImage(image)
+		{
+			var sourceCanvas = document.createElement('canvas');
+			sourceCanvas.width = image.width;
+			sourceCanvas.height = image.height;
+
+			var sourceContext = sourceCanvas.getContext('2d');
+			sourceContext.drawImage(image, 0, 0);
+
+			var pixelData = PixelData.fromImageData(sourceContext.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height));
+
+			var outputPixelData = upsampleImage(pixelData, scale2X);
+			return outputPixelData;
+		}
+
 		function processFile(file)
 		{
 			if (!file)
@@ -150,8 +165,11 @@
 				setProcessingUIState(false);
 
 				var contents = e.target.result;
-				document.getElementById('sourceImage').src = contents;
-				var pixelData = onSourceLoad();
+				var image = document.getElementById('sourceImage');
+				image.src = contents;
+
+				var pixelData = processImage(image);
+
 				var dataURL = pixelData.toDataURL();
 				document.getElementById("destImage").src = dataURL;
 

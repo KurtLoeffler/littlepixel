@@ -23,7 +23,8 @@ class PixelData
 		this.width = width;
 		this.height = height;
 	}
-	static fromImageData(imageData) {
+	static fromImageData(imageData)
+	{
 		var pixelData = new PixelData(imageData.width, imageData.height);
 		pixelData.data = imageData.data;
 		return pixelData;
@@ -61,8 +62,10 @@ class PixelData
 		destCanvas.width = this.width;
 		destCanvas.height = this.height;
 
-		for (var x = 0; x < this.width; x++) {
-			for (var y = 0; y < this.height; y++) {
+		for (var x = 0; x < this.width; x++)
+		{
+			for (var y = 0; y < this.height; y++)
+			{
 				var outputIndex = (y*this.width+x)*4;
 
 				putPixelData[0]   = this.data[outputIndex+0];
@@ -77,24 +80,7 @@ class PixelData
 	}
 }
 
-var image = new Image();
-function onSourceLoad() {
-	var image = document.getElementById("sourceImage");
-	image.crossOrigin = "Anonymous";
-	var sourceCanvas = document.createElement('canvas');
-	sourceCanvas.width = image.width;
-	sourceCanvas.height = image.height;
-
-	var sourceContext = sourceCanvas.getContext('2d');
-	sourceContext.drawImage(image, 0, 0);
-
-	var pixelData = PixelData.fromImageData(sourceContext.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height));
-
-	var outputPixelData = processImage(pixelData, scale2X);
-	return outputPixelData;
-};
-
-function processImage(sourcePixelData, processorFunction) {
+function upsampleImage(sourcePixelData, processorFunction) {
 	var sourceWidth = sourcePixelData.width;
 	var sourceHeight = sourcePixelData.height;
 
@@ -103,7 +89,8 @@ function processImage(sourcePixelData, processorFunction) {
 	var outputHeight = sourceHeight*2;
 	var outputPixelData = new PixelData(outputWidth, outputHeight);
 
-	for (var x = 0; x < sourceWidth; x++) {
+	for (var x = 0; x < sourceWidth; x++)
+	{
 		for (var y = 0; y < sourceHeight; y++)
 		{
 			processorFunction(sourcePixelData, outputPixelData, x, y);
